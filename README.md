@@ -1,3 +1,5 @@
+[![Dart](https://github.com/machshev/haqor/actions/workflows/dart.yml/badge.svg)](https://github.com/machshev/haqor/actions/workflows/dart.yml)
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
