@@ -45,3 +45,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# modules - here for development purposes but can't commit to git because of
+# potential licencing issues. Need to understand the licencing issues better.
+modules/

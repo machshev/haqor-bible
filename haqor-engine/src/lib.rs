@@ -2,31 +2,64 @@
 
 pub struct Bible {
     pub name: String,
-    pub file_path: String,
+    file_name: String,
 }
 
-impl Bible {
-    
-    pub fn get_bible(name: &str) -> Bible {
-        let file_path: String = "file_path".into();
+
+pub struct Library {
+    base_path: String,
+}
+
+impl Default for Library {
+    fn default() -> Self {
+        Library {base_path: "Default".to_string()}
+    }
+}
+
+
+impl Library {
+
+    pub fn get_library(base_path: &str) -> Library{
+        Library {base_path: base_path.to_string()}
+    }
+
+    pub fn get_bible(&self, name: &str) -> Bible {
+        let file_name: String = "file_path".into();
 
         log::info!("Loading bible '{}'", name);
         
-        Bible {name: "Test Bible".to_string(), file_path}
+        Bible {name: "Test Bible".to_string(), file_name}
     }
 
 }
+
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
+    fn test_get_default_library(){
+        let lib = Library::default();
+
+        assert_eq!(lib.base_path, "Default");
+    }
+
+    #[test]
+    fn test_get_library(){
+        let lib = Library::get_library("../test_library");
+
+        assert_eq!(lib.base_path, "../test_library");
+    }
+    
+    #[test]
     fn test_get_bible(){
-        let bible = Bible::get_bible("test_bible");
+        let lib = Library::default();
+        let bible = lib.get_bible("test_bible");
 
         assert_eq!(bible.name, "Test Bible");
-        assert_eq!(bible.file_path, "file_path");
+        assert_eq!(bible.file_name, "file_path");
     }
 
     /*
