@@ -1,5 +1,7 @@
 // Load text from bible verse (SQLite)
 
+use std::path::{PathBuf, Path};
+
 pub struct Bible {
     pub name: String,
     file_name: String,
@@ -7,20 +9,20 @@ pub struct Bible {
 
 
 pub struct Library {
-    base_path: String,
+    base_path: PathBuf,
 }
 
 impl Default for Library {
     fn default() -> Self {
-        Library {base_path: "Default".to_string()}
+        Library {base_path: PathBuf::from("~/.haqor/library/")}
     }
 }
 
 
 impl Library {
 
-    pub fn get_library(base_path: &str) -> Library{
-        Library {base_path: base_path.to_string()}
+    pub fn get_library(base_path: &Path) -> Library{
+        Library {base_path: base_path.to_path_buf()}
     }
 
     pub fn get_bible(&self, name: &str) -> Bible {
@@ -43,15 +45,17 @@ mod tests {
     fn test_get_default_library(){
         let lib = Library::default();
 
-        assert_eq!(lib.base_path, "Default");
+        assert_eq!(lib.base_path, Path::new("~/.haqor/library/"));
     }
 
     #[test]
     fn test_get_library(){
-        let lib = Library::get_library("../test_library");
+        let lib = Library::get_library(Path::new("../test_library"));
 
-        assert_eq!(lib.base_path, "../test_library");
+        assert_eq!(lib.base_path, Path::new("../test_library"));
     }
+
+
     
     #[test]
     fn test_get_bible(){
