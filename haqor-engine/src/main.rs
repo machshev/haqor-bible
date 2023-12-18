@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
-//use haqor_engine::{Bible, Library};
-use log::{debug, error, info, trace, warn};
+use haqor_engine::{Bible, Library, ResourceRepo};
+use log::info;
 use std::env;
 
 /// Summarise bible resource
@@ -19,16 +19,19 @@ struct Cli {
     verbose: u8,
 
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
 enum Commands {
     /// Fetch bible from remote repository
+    #[command(arg_required_else_help = true)]
     Fetch {
         /// Name of the bible to download
         bible: String,
     },
+    /// Read bible verse
+    Read { bible: String },
 }
 
 fn main() {
@@ -47,14 +50,17 @@ fn main() {
     }
     env_logger::init();
 
-    error!("Error");
-    warn!("Warn");
-    info!("Info");
-    debug!("Debug");
-    trace!("Trace");
+    let library = Library::default();
 
-    // let library = Library::default();
-    // let bible: Bible = library.get_bible(&*cli.bible);
+    match cli.command {
+        Commands::Fetch { bible } => {
+            let repo = ResourceRepo::default();
+            repo.fetch_bible(library, &bible);
+        }
+        Commands::Read { bible } => {
+            let bible: Bible = library.get_bible(&bible);
 
-    // info!("Bible: {:?}", bible);
+            info!("Bible: {:?}", bible);
+        }
+    }
 }

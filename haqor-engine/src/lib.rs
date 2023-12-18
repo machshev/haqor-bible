@@ -1,9 +1,10 @@
 // Load text from bible verse (SQLite)
 
+use log::debug;
+use log::info;
 use std::env;
 use std::fs::File;
-use std::io;
-use std::os::unix::ffi::OsStrExt;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -22,17 +23,19 @@ impl Default for ResourceRepo {
     fn default() -> Self {
         ResourceRepo {
             name: "mysword".to_string(),
-            url: "https://mysword-bible.info/download/getfile.php?file=".to_string(),
+            url: "https://mysword-bible.info/download/".to_string(),
         }
     }
 }
 
 impl ResourceRepo {
-    fn fetch_bible(&self, library: Library, name: &str) {
+    pub fn fetch_bible(&self, library: Library, name: &str) {
         let bible_url = format!("{}{}.bbl.mybible.gz", self.url, name);
 
         let resp = reqwest::blocking::get(bible_url).expect("request failed");
-        let body = resp.text().expect("body invalid");
+        let body = resp.bytes().expect("body invalid");
+
+        debug!("Number of bytes {}", body.len());
 
         library.save_bible(name, &body);
     }
@@ -63,9 +66,16 @@ impl Library {
         }
     }
 
-    pub fn save_bible(&self, file_name: &str, content: &str) {
-        let mut out = File::create(self.base_path.join(file_name)).expect("failed to create file");
-        io::copy(&mut content.as_bytes(), &mut out).expect("failed to copy content");
+    pub fn save_bible(&self, file_name: &str, content: &[u8]) {
+        let file_path = self.base_path.join(format!("{}.bbl.mybible.gz", file_name));
+
+        info!("Saving bible to {:?}", file_path);
+
+        std::fs::create_dir_all(self.base_path.as_path())
+            .expect("failed to create parent directories");
+
+        let mut out = File::create(file_path).expect("failed to create file");
+        out.write_all(content).expect("failed to write file");
     }
 
     pub fn get_bible(&self, name: &str) -> Bible {
